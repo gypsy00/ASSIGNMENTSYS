@@ -79,4 +79,23 @@ public class EnrollmentStore {
         }
         return null;
     }
+
+    //delete enrollment
+    public void deleteEnrollmentById(String enrollmentId, List<Enrollment> enrollments) {
+
+        Enrollment toRemove = null;
+
+        for (Enrollment e : enrollments) {
+            if (e.getEnrollmentId().equals(enrollmentId)) {
+                toRemove = e;
+                break;
+            }
+        }
+
+        if (toRemove != null) {
+            enrollments.remove(toRemove);
+            saveEnrollments(enrollments);
+        }
+    }
+
 }
