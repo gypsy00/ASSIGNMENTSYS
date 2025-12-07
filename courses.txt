@@ -1,3 +1,4 @@
-CS101,Programming 1,30,Monday,10-12,Room A
 CS102,Databases,30,Tuesday,14-16,Room B
 CS103,Web Dev,15,Friday,09-11,Room C
+C102,INTRO 2,10,MONDAY,10:00,B101
+20,SOM,10,TUESDAY,10:00,LC100

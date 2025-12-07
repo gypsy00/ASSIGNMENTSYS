@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -52,10 +53,15 @@
       </VBox>
    </right>
    <bottom>
-      <Button fx:id="addCourseButton" mnemonicParsing="false" onAction="#onAddCourseClicked" prefWidth="160.0" text="Add Course" BorderPane.alignment="BOTTOM_LEFT">
+      <HBox spacing="10.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="10.0" left="15.0" right="15.0" />
          </BorderPane.margin>
-      </Button>
+         <children>
+            <Button fx:id="addCourseButton" mnemonicParsing="false" onAction="#onAddCourseClicked" text="Add Course" HBox.hgrow="ALWAYS" />
+            <Button fx:id="updateCourseButton" mnemonicParsing="false" onAction="#onUpdateCourseClicked" text="Update Course" HBox.hgrow="ALWAYS" />
+            <Button fx:id="deleteCourseButton" mnemonicParsing="false" onAction="#onDeleteCourseClicked" text="Delete Course" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
    </bottom>
 </BorderPane>

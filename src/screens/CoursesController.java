@@ -4,13 +4,16 @@ import core.Course;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import storagelayer.CourseBank;
 import java.util.List;
-import javafx.scene.control.Alert;
+
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ButtonBar;
+import java.util.Optional;
+
+
 import javafx.scene.control.Alert.AlertType;
 import javafx.event.ActionEvent;
 
@@ -53,7 +56,13 @@ public class CoursesController {
     @FXML
     private TextField roomField;
 
+    @FXML
+    private Button updateButton;
+    @FXML
+    private Button deleteButton;
 
+
+    //add button method
     @FXML
     private void onAddCourseClicked(ActionEvent event) {
         String id = courseIdField.getText().trim();
@@ -84,22 +93,26 @@ public class CoursesController {
         // update table UI
         courseTable.getItems().add(newCourse);
 
-        // TODO: later we’ll save to file with CourseBank here
-        // try {
-        //     courseBank.addCourse(newCourse);
-        //     courseBank.saveCourses();
-        // } catch (Exception e) {
-        //     showError("Could not save course: " + e.getMessage());
-        // }
 
-        // clear fields
-        courseIdField.clear();
-        courseNameField.clear();
-        creditsField.clear();
-        dayField.clear();
-        timeField.clear();
-        roomField.clear();
+
+        try {
+            courseBank.addCourse(newCourse);
+
+            loadCoursesFromFile();
+
+            // clear fields
+            courseIdField.clear();
+            courseNameField.clear();
+            creditsField.clear();
+            dayField.clear();
+            timeField.clear();
+            roomField.clear();
+        }catch (Exception e){
+            showError("Could not save courses: " + e.getMessage());
+        }
     }
+
+
 
 
     private void showError(String message) {
@@ -110,9 +123,116 @@ public class CoursesController {
         alert.showAndWait();
     }
 
+    private boolean confirm (String title, String message) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        ButtonType yesButton = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+        ButtonType noButton = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(yesButton, noButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == yesButton;
+    }
+
+
+    //delete button method
+    @FXML
+    private void onDeleteCourseClicked(ActionEvent event) {
+        Course selected = courseTable.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            showError("Select a course to delete.");
+            return;
+        }
+
+        // Ask for confirmation
+        boolean ok = confirm(
+                "Delete Course",
+                "Are you sure you want to delete course " + selected.getCourseId() + "?"
+        );
+
+        if (!ok) {
+            return; // user clicked No
+        }
+
+        // 1) Remove from CourseBank (and file)
+        courseBank.removeCourse(selected);
+
+        // 2) Remove from table
+        courseTable.getItems().remove(selected);
+
+        // 3) Clear fields (optional)
+        courseIdField.clear();
+        courseNameField.clear();
+        creditsField.clear();
+        dayField.clear();
+        timeField.clear();
+        roomField.clear();
+    }
+
+
+    //update button method
+    @FXML
+    private void onUpdateCourseClicked(ActionEvent event) {
+        Course selected = courseTable.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            showError("Select a course to update.");
+            return;
+        }
+
+        // Read values from the form
+        String id    = courseIdField.getText().trim();
+        String name  = courseNameField.getText().trim();
+        String creditsText = creditsField.getText().trim();
+        String day   = dayField.getText().trim();
+        String time  = timeField.getText().trim();
+        String room  = roomField.getText().trim();
+
+        // Basic validation
+        if (id.isEmpty() || name.isEmpty() || creditsText.isEmpty()
+                || day.isEmpty() || time.isEmpty() || room.isEmpty()) {
+            showError("All fields are required.");
+            return;
+        }
+
+        int credits;
+        try {
+            credits = Integer.parseInt(creditsText);
+        } catch (NumberFormatException e) {
+            showError("Credits must be a number.");
+            return;
+        }
+
+        // Ask for confirmation before changing anything
+        boolean ok = confirm(
+                "Update Course",
+                "Are you sure you want to update course " + selected.getCourseId() + "?"
+        );
+
+        if (!ok) {
+            return; // user cancelled
+        }
+
+        // Build updated Course object
+        Course updatedCourse = new Course(id, name, credits, day, time, room);
+
+        // 1) Update in CourseBank (and file)
+        courseBank.updateCourse(selected, updatedCourse);
+
+        // 2) Update in table
+        int index = courseTable.getItems().indexOf(selected);
+        courseTable.getItems().set(index, updatedCourse);
+        courseTable.getSelectionModel().select(updatedCourse);
+    }
 
     private CourseBank courseBank = new CourseBank();
 
+
+    //initialize method
     @FXML
     public void initialize() {
         // link columns to Course fields (getter names in Course.java)
@@ -122,9 +242,25 @@ public class CoursesController {
         dayCol.setCellValueFactory(new PropertyValueFactory<>("day"));
         timeCol.setCellValueFactory(new PropertyValueFactory<>("time"));
         roomCol.setCellValueFactory(new PropertyValueFactory<>("room"));
+
+        loadCoursesFromFile();
+
+        courseTable.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, selectedCourse) -> {
+                    if (selectedCourse != null) {
+                        courseIdField.setText(selectedCourse.getCourseId());
+                        courseNameField.setText(selectedCourse.getCourseName());
+                        creditsField.setText(String.valueOf(selectedCourse.getCredits()));
+                        dayField.setText(selectedCourse.getDay());
+                        timeField.setText(selectedCourse.getTime());
+                        roomField.setText(selectedCourse.getRoom());
+                    }
+                }
+        );
     }
 
         private void loadCoursesFromFile(){
+        //get courses from CourseBank
             List<Course> courses = courseBank.loadCourses();
             ObservableList<Course> data = FXCollections.observableArrayList(courses);
             courseTable.setItems(data);

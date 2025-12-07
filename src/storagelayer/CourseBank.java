@@ -3,7 +3,11 @@ package storagelayer;
 //imports
 import core.Course;
 
-import java.io.BufferedReader
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,60 +15,91 @@ import java.util.List;
 public class CourseBank {
 
     // course store
-    private final String FILE_NAME = "courses.txt";
+    private static final String FILE_NAME = "courses.txt";
 
-    // saving courses to file
-    public void saveCourse(List<Course> courses) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME))) {
-            for (Course course : courses) {
-                writer.println(
-                        course.getCourseId() + "," +
-                                course.getCourseName() + "," +
-                                course.getCredits() + "," +
-                                course.getDay() + "," +
-                                course.getTime() + "," +
-                                course.getRoom()
-                );
-            }
-        } catch (IOException e) {
-            System.out.println("Error saving courses: " + e.getMessage());
+    private List<Course> courses = new ArrayList<>();
+
+    public CourseBank() {
+        loadFromFile();
+    }
+
+    public List<Course> getAllCourses() {
+        return courses;
+    }
+
+    public List<Course> loadCourses() {
+        loadFromFile();
+        return new ArrayList<>(courses);
+    }
+
+    public void addCourse(Course course) {
+        courses.add(course);
+        saveToFile();
+    }
+
+    public void saveCourse(List<Course> newCourses) {
+        courses.clear();
+        courses.addAll(newCourses);
+        saveToFile();
+    }
+
+    public void removeCourse(Course course) {
+        courses.remove(course);
+        saveToFile();
+    }
+
+    public void updateCourse(Course oldCourse, Course updatedCourse) {
+        int index = courses.indexOf(oldCourse);
+        if (index >=0) {
+            courses. set(index, updatedCourse);
+            saveToFile();
         }
     }
 
-    // load courses from file
-    public List<Course> loadCourses() {
-        List<Course> courses = new ArrayList<>();
+    //loading courses from file
+    public void loadFromFile() {
+        courses.clear();
 
-        File file = new File(FILE_NAME);
-        if (!file.exists()) {
-            return courses; // return empty list if file doesn't exist
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",", -1);
-                if (parts.length < 6) continue; // skip malformed lines
+                String[] parts = line.split(",");
+                if (parts.length != 6) continue;
 
-                String courseId = parts[0];
-                String courseName = parts[1];
-                int credits;
-                try {
-                    credits = Integer.parseInt(parts[2]);
-                } catch (NumberFormatException nfe) {
-                    credits = 0;
-                }
+                String id = parts[0];
+                String name = parts[1];
+                int credits = Integer.parseInt(parts[2]);
                 String day = parts[3];
                 String time = parts[4];
                 String room = parts[5];
 
-                Course course = new Course(courseId, courseName, credits, day, time, room);
-                courses.add(course);
+                courses.add(new Course(id, name, credits, day, time, room));
             }
         } catch (IOException e) {
-            System.out.println("Error loading courses: " + e.getMessage());
+            System.err.println("Could not load courses:" + e.getMessage());
         }
+    }
 
-        return courses;
+    //saving courses to file
+    private void saveToFile() {
+        File file = new File(FILE_NAME);
+        System.out.println("Saving courses to " + file.getAbsolutePath());
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            for (Course c : courses) {
+                String line = String.join(",",
+                        c.getCourseId(),
+                        c.getCourseName(),
+                        String.valueOf(c.getCredits()),
+                        c.getDay(),
+                        c.getTime(),
+                        c.getRoom()
+                );
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Could not save courses:" + e.getMessage());
+        }
     }
 }
