@@ -17,6 +17,9 @@ import java.util.Optional;
 import javafx.scene.control.Alert.AlertType;
 import javafx.event.ActionEvent;
 
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+
 public class CoursesController {
 
 
@@ -56,11 +59,18 @@ public class CoursesController {
     @FXML
     private TextField roomField;
 
+    //firlds for update and delete button
     @FXML
     private Button updateButton;
     @FXML
     private Button deleteButton;
 
+    //fields for search
+    @FXML
+    private TextField searchField;
+
+    private ObservableList<Course> masterData = FXCollections.observableArrayList();
+    private FilteredList<Course> filteredData;
 
     //add button method
     @FXML
@@ -91,6 +101,7 @@ public class CoursesController {
         Course newCourse = new Course(id, name, credits, day, time, room);
 
         // update table UI
+        masterData.add(newCourse);
         courseTable.getItems().add(newCourse);
 
 
@@ -159,6 +170,7 @@ public class CoursesController {
         }
 
         // 1) Remove from CourseBank (and file)
+        masterData.remove(selected);
         courseBank.removeCourse(selected);
 
         // 2) Remove from table
@@ -221,6 +233,10 @@ public class CoursesController {
         Course updatedCourse = new Course(id, name, credits, day, time, room);
 
         // 1) Update in CourseBank (and file)
+        int indexInMaster = masterData.indexOf(selected);
+        if (indexInMaster >= 0) {
+            masterData.set(indexInMaster, updatedCourse);
+        }
         courseBank.updateCourse(selected, updatedCourse);
 
         // 2) Update in table
@@ -235,7 +251,7 @@ public class CoursesController {
     //initialize method
     @FXML
     public void initialize() {
-        // link columns to Course fields (getter names in Course.java)
+        // 1) Column setup (keep what you already had)
         idCol.setCellValueFactory(new PropertyValueFactory<>("courseId"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("courseName"));
         creditsCol.setCellValueFactory(new PropertyValueFactory<>("credits"));
@@ -243,10 +259,44 @@ public class CoursesController {
         timeCol.setCellValueFactory(new PropertyValueFactory<>("time"));
         roomCol.setCellValueFactory(new PropertyValueFactory<>("room"));
 
-        loadCoursesFromFile();
+        // 2) Load courses from CourseBank into masterData
+        List<Course> courses = courseBank.loadCourses();
+        masterData.setAll(courses);
 
+        // 3) Create filtered list wrapping masterData
+        filteredData = new FilteredList<>(masterData, c -> true);
+
+        // 4) Sorted list so table sorting still works
+        SortedList<Course> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(courseTable.comparatorProperty());
+
+        // 5) Connect to table
+        courseTable.setItems(sortedData);
+
+        // 6) Live search
+        searchField.textProperty().addListener((obs, oldValue, newValue) -> {
+            String filter = (newValue == null) ? "" : newValue.trim().toLowerCase();
+
+            if (filter.isEmpty()) {
+                // show all
+                filteredData.setPredicate(c -> true);
+            } else {
+                filteredData.setPredicate(c -> {
+                    if (c == null) return false;
+
+                    String id   = c.getCourseId().toLowerCase();
+                    String name = c.getCourseName().toLowerCase();
+
+                    return id.contains(filter) || name.contains(filter);
+                });
+            }
+        });
+
+        searchField.requestFocus();
+
+        // 7) Your existing selection listener (copy your old code here)
         courseTable.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, selectedCourse) -> {
+                (observable, oldCourse, selectedCourse) -> {
                     if (selectedCourse != null) {
                         courseIdField.setText(selectedCourse.getCourseId());
                         courseNameField.setText(selectedCourse.getCourseName());
