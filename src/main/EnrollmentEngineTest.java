@@ -22,7 +22,7 @@ public class EnrollmentEngineTest {
         EnrollmentStore enrollmentStore = new EnrollmentStore();
         EnrollmentEngine engine = new EnrollmentEngine();
 
-        List<Student> students = studentStore.loadStudents();
+        List<Student> students = studentStore.getStudents();
         List<Course> courses = courseStore.loadCourses();
         List<Enrollment> enrollments = enrollmentStore.loadEnrollments(students, courses);
 

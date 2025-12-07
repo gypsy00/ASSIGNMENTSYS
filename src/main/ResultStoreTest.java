@@ -16,7 +16,7 @@ public class ResultStoreTest {
         CourseBank courseBank = new CourseBank();
         ResultStore resultStore = new ResultStore();
 
-        List<Student> students = studentStore.loadStudents();
+        List<Student> students = studentStore.getStudents();
         List<Course> courses = courseBank.loadCourses();
 
         if (students.isEmpty() || courses.isEmpty()) {

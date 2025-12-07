@@ -20,6 +20,12 @@ import javafx.event.ActionEvent;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
+import java.io.IOException;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.scene.Node;
+
 public class CoursesController {
 
 
@@ -307,6 +313,18 @@ public class CoursesController {
                     }
                 }
         );
+    }
+
+    //page navigation
+    @FXML
+    private void handleGoToStudents(ActionEvent event) {
+        try {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/Students.fxml"));
+            stage.setScene(new Scene(loader.load()));
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
         private void loadCoursesFromFile(){

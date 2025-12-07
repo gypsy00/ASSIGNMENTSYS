@@ -19,7 +19,7 @@ public class EnrollmentStoreTest {
         CourseBank courseStore = new CourseBank();
         EnrollmentStore enrollmentStore = new EnrollmentStore();
 
-        List<Student> students = studentStore.loadStudents();
+        List<Student> students = studentStore.getStudents();
         List<Course> courses = courseStore.loadCourses();
 
         if (students.isEmpty() || courses.isEmpty()) {

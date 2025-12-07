@@ -11,9 +11,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="screens.CoursesController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="screens.StudentsController">
    <top>
-      <Label alignment="CENTER" text="Course Registration System-Courses" BorderPane.alignment="CENTER">
+      <Label alignment="CENTER" text="Students" BorderPane.alignment="CENTER">
          <font>
             <Font size="22.0" />
          </font>
@@ -23,17 +23,16 @@
       <VBox spacing="10.0" BorderPane.alignment="TOP_LEFT">
          <children>
             <TextField fx:id="searchField" maxWidth="1.7976931348623157E308" prefWidth="200.0" promptText="SEARCH BY NAME OR ID" />
-            <TableView fx:id="courseTable" prefHeight="200.0" prefWidth="500.0">
+            <TableView fx:id="studentTable" prefHeight="200.0" prefWidth="500.0">
               <columns>
                 <TableColumn fx:id="idCol" prefWidth="75.0" text="ID" />
                 <TableColumn fx:id="nameCol" prefWidth="75.0" text="Name" />
-                  <TableColumn fx:id="creditsCol" prefWidth="75.0" text="Credits" />
-                  <TableColumn fx:id="dayCol" prefWidth="75.0" text="Days" />
-                  <TableColumn fx:id="timeCol" prefWidth="75.0" text="Time" />
-                  <TableColumn fx:id="roomCol" prefWidth="75.0" text="Rooms" />
+                  <TableColumn fx:id="studentNumberCol" prefWidth="75.0" text="Student Number" />
+                  <TableColumn fx:id="yearCol" prefWidth="75.0" text="Year" />
+                  <TableColumn fx:id="emailCol" prefWidth="75.0" text="Email" />
               </columns>
             </TableView>
-            <Button mnemonicParsing="false" onAction="#handleGoToStudents" text="Go To Students" />
+            <Button mnemonicParsing="false" onAction="#handleGoToCourses" text="Go To Courses" />
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -47,17 +46,15 @@
          </padding>
          <children>
             <Label text="ID" />
-            <TextField fx:id="courseIdField" />
+            <TextField fx:id="studentIdField" />
             <Label text="Name" />
-            <TextField fx:id="courseNameField" />
-            <Label text="Credits" />
-            <TextField fx:id="creditsField" />
-            <Label text="Day" />
-            <TextField fx:id="dayField" />
-            <Label text="Time" />
-            <TextField fx:id="timeField" />
-            <Label text="Room" />
-            <TextField fx:id="roomField" />
+            <TextField fx:id="studentNameField" />
+            <Label text="Student Number" />
+            <TextField fx:id="studentNumberField" />
+            <Label text="Year" />
+            <TextField fx:id="yearField" />
+            <Label text="Email" />
+            <TextField fx:id="emailField" layoutX="20.0" layoutY="222.0" />
          </children>
       </VBox>
    </right>
@@ -67,9 +64,9 @@
             <Insets bottom="10.0" left="15.0" right="15.0" />
          </BorderPane.margin>
          <children>
-            <Button fx:id="addCourseButton" mnemonicParsing="false" onAction="#onAddCourseClicked" text="Add Course" HBox.hgrow="ALWAYS" />
-            <Button fx:id="updateCourseButton" mnemonicParsing="false" onAction="#onUpdateCourseClicked" text="Update Course" HBox.hgrow="ALWAYS" />
-            <Button fx:id="deleteCourseButton" mnemonicParsing="false" onAction="#onDeleteCourseClicked" text="Delete Course" HBox.hgrow="ALWAYS" />
+            <Button fx:id="addStudentButton" mnemonicParsing="false" onAction="#onAddStudentClicked" text="Add Course" HBox.hgrow="ALWAYS" />
+            <Button fx:id="updateStudentButton" mnemonicParsing="false" onAction="#onUpdateStudentClicked" text="Update Course" HBox.hgrow="ALWAYS" />
+            <Button fx:id="deleteStudentButton" mnemonicParsing="false" onAction="#onDeleteStudentClicked" text="Delete Course" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
    </bottom>

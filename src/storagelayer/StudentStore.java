@@ -9,10 +9,39 @@ import java.util.List;
 public class StudentStore {
 
     // field for students store
-    private final String FILE_NAME = "students.txt";
+    private static final String FILE_NAME = "students.txt";
+
+    private final List<Student> students = new ArrayList<>();
+
+    public StudentStore() {
+        loadFromFile();
+    }
+
+    public List<Student> getStudents() {
+        return new ArrayList<>(students);
+    }
+
+    public void addStudent(Student student) {
+        students.add(student);
+        saveToFile();
+    }
+
+    public void updateStudent(Student oldStudent, Student updatedStudent) {
+        int index = students.indexOf(oldStudent);
+        if (index >= 0) {
+            students.set(index, updatedStudent);
+            saveToFile();
+        }
+    }
+
+    public void removeStudent(Student student) {
+        students.remove(student);
+        saveToFile();
+    }
 
     // Method to save students list to file
-    public void saveStudents(List<Student> students) {
+
+    private void saveToFile() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(FILE_NAME))) {
             for (Student student : students) {
                 writer.println(
@@ -24,24 +53,25 @@ public class StudentStore {
                 );
             }
         } catch (IOException e) {
-            System.out.println("Error saving students: " + e.getMessage());
+            System.out.print("Error saving students " + e.getMessage());
         }
     }
 
-    // Method to load students from file
-    public List<Student> loadStudents() {
-        List<Student> list = new ArrayList<>();
+    private void loadFromFile() {
+        students.clear();
 
         File file = new File(FILE_NAME);
         if (!file.exists()) {
-            return list; // return empty list if file doesn't exist
+            System.out.println("No students.txt file yet, starting empty ");
+            return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
+
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",", -1);
-                if (parts.length < 5) continue; // skip malformed lines
+                if (parts.length != 5) continue;
 
                 String id = parts[0];
                 String name = parts[1];
@@ -54,13 +84,20 @@ public class StudentStore {
                     yearOfStudy = 0;
                 }
 
-                Student student = new Student(id, name, studentNumber, email, yearOfStudy);
-                list.add(student);
+                Student s = new Student(id, name, studentNumber, email, yearOfStudy);
+                students.add(s);
             }
         } catch (IOException e) {
-            System.out.println("Error loading students: " + e.getMessage());
+            System.out.print("Error loading students " + e.getMessage());
         }
-
-        return list;
     }
 }
+
+
+
+
+
+
+
+
+
