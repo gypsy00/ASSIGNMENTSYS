@@ -15,6 +15,7 @@ import java.util.List;
 public class CourseBank {
 
     // course store
+
     private static final String FILE_NAME = "courses.txt";
 
     private List<Course> courses = new ArrayList<>();
@@ -56,6 +57,15 @@ public class CourseBank {
         }
     }
 
+    public Course findById(String id) {
+        for (Course course : courses) {
+            if (course.getCourseId().equalsIgnoreCase(id)) {
+                return course;
+            }
+        }
+        return null;
+    }
+
     //loading courses from file
     public void loadFromFile() {
         courses.clear();
@@ -63,7 +73,7 @@ public class CourseBank {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
+                String[] parts = line.split(",", -1);
                 if (parts.length != 6) continue;
 
                 String id = parts[0];

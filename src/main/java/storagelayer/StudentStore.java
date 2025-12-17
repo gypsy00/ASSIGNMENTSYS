@@ -39,6 +39,15 @@ public class StudentStore {
         saveToFile();
     }
 
+    public Student findById(String id) {
+        for (Student s : students) {
+            if (s.getId().equals(id)){
+                return s;
+            }
+        }
+        return null;
+    }
+
     // Method to save students list to file
 
     private void saveToFile() {
@@ -47,8 +56,8 @@ public class StudentStore {
                 writer.println(
                         student.getId() + "," +
                                 student.getName() + "," +
-                                student.getStudentNumber() + "," +
                                 student.getEmail() + "," +
+                                student.getStudentNumber() + "," +
                                 student.getYearOfStudy()
                 );
             }
@@ -75,8 +84,8 @@ public class StudentStore {
 
                 String id = parts[0];
                 String name = parts[1];
-                String studentNumber = parts[2];
-                String email = parts[3];
+                String email = parts[2];
+                String studentNumber = parts[3];
                 int yearOfStudy;
                 try {
                     yearOfStudy = Integer.parseInt(parts[4]);
@@ -84,7 +93,7 @@ public class StudentStore {
                     yearOfStudy = 0;
                 }
 
-                Student s = new Student(id, name, studentNumber, email, yearOfStudy);
+                Student s = new Student(id, name, email, studentNumber, yearOfStudy);
                 students.add(s);
             }
         } catch (IOException e) {

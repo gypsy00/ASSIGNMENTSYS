@@ -64,9 +64,9 @@
             <Insets bottom="10.0" left="15.0" right="15.0" />
          </BorderPane.margin>
          <children>
-            <Button fx:id="addStudentButton" mnemonicParsing="false" onAction="#onAddStudentClicked" text="Add Course" HBox.hgrow="ALWAYS" />
-            <Button fx:id="updateStudentButton" mnemonicParsing="false" onAction="#onUpdateStudentClicked" text="Update Course" HBox.hgrow="ALWAYS" />
-            <Button fx:id="deleteStudentButton" mnemonicParsing="false" onAction="#onDeleteStudentClicked" text="Delete Course" HBox.hgrow="ALWAYS" />
+            <Button fx:id="addStudentButton" mnemonicParsing="false" onAction="#onAddStudentClicked" text="Add Student" HBox.hgrow="ALWAYS" />
+            <Button fx:id="updateStudentButton" mnemonicParsing="false" onAction="#onUpdateStudentClicked" text="Update Student" HBox.hgrow="ALWAYS" />
+            <Button fx:id="deleteStudentButton" mnemonicParsing="false" onAction="#onDeleteStudentClicked" text="Delete Student" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
    </bottom>

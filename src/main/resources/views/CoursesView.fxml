@@ -33,6 +33,8 @@
                   <TableColumn fx:id="roomCol" prefWidth="75.0" text="Rooms" />
               </columns>
             </TableView>
+            <Button mnemonicParsing="false" onAction="#handleGoToEnrollments" text="Go To Enrollments" />
+            <Button mnemonicParsing="false" onAction="#handleGoToResults" text="Go To Results" />
             <Button mnemonicParsing="false" onAction="#handleGoToStudents" text="Go To Students" />
          </children>
          <padding>

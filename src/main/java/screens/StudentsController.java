@@ -1,8 +1,9 @@
 package screens;
 
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -14,7 +15,6 @@ import javafx.scene.Node;
 import storagelayer.StudentStore;   // adjust this if your package/name is different
 import core.Student;               // adjust to your real Student class
 
-import java.io.IOException;
 
 public class StudentsController {
 
@@ -54,6 +54,9 @@ public class StudentsController {
     @FXML
     private TextField yearField;
 
+    @FXML
+    private TextField searchField;
+
 
     // data storage
     private final ObservableList<Student> masterData = FXCollections.observableArrayList();
@@ -67,8 +70,8 @@ public class StudentsController {
         // link columns to Student getters (adjust names to match your Student class)
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        studentNumberCol.setCellValueFactory(new PropertyValueFactory<>("studentNumber"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+        studentNumberCol.setCellValueFactory(new PropertyValueFactory<>("studentNumber"));
         yearCol.setCellValueFactory(new PropertyValueFactory<>("yearOfStudy"));
 
         loadStudentsFromFile();
@@ -88,7 +91,31 @@ public class StudentsController {
                         yearField.setText(String.valueOf(newSel.getYearOfStudy()));
                     }
                 });
+
+        // Live search
+        FilteredList<Student> filtered = new FilteredList<>(masterData, s -> true);
+
+        searchField.textProperty().addListener((obs, oldValue, newValue) -> {
+            String filter = newValue == null ? "" : newValue.toLowerCase().trim();
+
+            filtered.setPredicate(s -> {
+                if (filter.isEmpty()) {
+                    return true;
+                }
+
+                String id = s.getId().toLowerCase();
+                String name = s.getName().toLowerCase();
+
+                return id.contains(filter) || name.contains(filter);
+            });
+        });
+
+        SortedList<Student> sorted = new SortedList<>(filtered);
+        sorted.comparatorProperty().bind(studentTable.comparatorProperty());
+        studentTable.setItems(sorted);
     }
+
+
 
     private void loadStudentsFromFile() {
         masterData.clear();
@@ -119,7 +146,8 @@ public class StudentsController {
             return;
         }
 
-        Student s = new Student(id, name, email,  studentNumber, year); // adjust ctor if needed
+
+        Student s = new Student(id, name, studentNumber, email, year); // adjust ctor if needed
 
         try {
             studentStore.addStudent(s);     // adjust method names to your StudentStore
@@ -160,6 +188,10 @@ public class StudentsController {
             showError("Year must be a number.");
             return;
         }
+
+
+
+        email = emailField.getText().trim();
 
         Student updated = new Student(id, name, email, studentNumber, year); // adjust ctor
 
@@ -224,7 +256,7 @@ public class StudentsController {
         alert.showAndWait();
     }
 
-    private boolean confirm(String title, String message) {
+    private boolean confirm (String title, String message) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
